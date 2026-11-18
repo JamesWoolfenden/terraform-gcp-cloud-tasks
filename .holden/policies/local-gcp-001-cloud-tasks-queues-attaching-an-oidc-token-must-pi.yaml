@@ -1,0 +1,21 @@
+id: LOCAL_GCP_001
+name: Cloud Tasks queues attaching an OIDC token must pin the target host with uri_override
+principle: identity-and-access
+severity: MEDIUM
+rationale: |
+  A queue-level http_target.oidc_token is attached to every task dispatched from the
+  queue, and enqueuers need no actAs on the token's service account. Without a
+  uri_override host, anyone with cloudtasks.enqueuer can point tasks at any URL and
+  invoke every backend that service account can reach (confused deputy).
+message: |
+  google_cloud_tasks_queue sets http_target.oidc_token but no http_target.uri_override.host.
+remediation: |
+  Add http_target.uri_override { scheme = "HTTPS", host = "<backend host>", uri_override_enforce_mode = "ALWAYS" },
+  or drop the queue-level oidc_token and have enqueuers set per-task tokens (which requires actAs).
+resources:
+  google_cloud_tasks_queue:
+    any:
+      - path: http_target.oidc_token
+        is_null: true
+      - path: http_target.uri_override.host
+        not_null: true

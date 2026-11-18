@@ -58,7 +58,7 @@ variable "http_method" {
 
 variable "uri_override_host" {
   type        = string
-  description = "Host every task is forced to (with scheme HTTPS). Null leaves the task's own URI untouched"
+  description = "Host every task is forced to (with scheme HTTPS). Required unless var.grant_enqueuers_act_as is true, because the queue attaches the invoker SA's OIDC token to every task; null leaves the task's own URI untouched"
   default     = null
 
   validation {

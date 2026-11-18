@@ -41,4 +41,14 @@ resource "google_cloud_tasks_queue" "main" {
   }
 
   depends_on = [google_service_account_iam_member.service_agent_token_creator]
+
+  lifecycle {
+    # Enqueuers need no actAs on the invoker SA for a queue-level token, so
+    # without a pinned host they could send invoker-authenticated requests to
+    # any URL. Allow that only when enqueuers are explicitly trusted with actAs.
+    precondition {
+      condition     = var.uri_override_host != null || var.grant_enqueuers_act_as
+      error_message = "var.uri_override_host must be set (pinning every task to that host) unless var.grant_enqueuers_act_as is true: the queue attaches the invoker SA's OIDC token to every task, so an unpinned queue lets any enqueuer call any backend the invoker SA can reach"
+    }
+  }
 }

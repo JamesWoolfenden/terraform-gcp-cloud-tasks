@@ -67,7 +67,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Name of the Cloud Tasks queue | `string` | n/a | yes |
 | <a name="input_oidc_audience"></a> [oidc\_audience](#input\_oidc\_audience) | Audience for the OIDC token. Null uses the task's target URI | `string` | `null` | no |
 | <a name="input_retry_config"></a> [retry\_config](#input\_retry\_config) | Retry behaviour for failed tasks. max\_attempts is bounded so a poison task cannot retry forever | <pre>object({<br/>    max_attempts       = optional(number, 5)<br/>    max_retry_duration = optional(string, "3600s")<br/>    min_backoff        = optional(string, "1s")<br/>    max_backoff        = optional(string, "300s")<br/>    max_doublings      = optional(number, 5)<br/>  })</pre> | `{}` | no |
-| <a name="input_uri_override_host"></a> [uri\_override\_host](#input\_uri\_override\_host) | Host every task is forced to (with scheme HTTPS). Null leaves the task's own URI untouched | `string` | `null` | no |
+| <a name="input_uri_override_host"></a> [uri\_override\_host](#input\_uri\_override\_host) | Host every task is forced to (with scheme HTTPS). Required unless var.grant\_enqueuers\_act\_as is true, because the queue attaches the invoker SA's OIDC token to every task; null leaves the task's own URI untouched | `string` | `null` | no |
 
 ## Outputs
 
