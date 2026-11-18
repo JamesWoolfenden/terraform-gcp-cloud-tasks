@@ -1,40 +1,40 @@
 {
-  "scan_date": "2026-11-18T12:00:00Z",
-  "scan_path": ".",
   "category": "all",
   "findings": [
     {
-      "id": "HOLDEN_AI_001",
-      "status": "fixed",
-      "first_seen": "2026-11-18",
-      "last_seen": "2026-11-18",
-      "unresolved_since": null,
-      "suppression_reason": null,
-      "principle": "identity-and-access",
-      "severity": "MEDIUM",
       "confidence": "medium",
-      "title": "Queue-level OIDC token without a pinned host lets any enqueuer invoke arbitrary backends as the invoker SA",
+      "explanation": "http_target.oidc_token attaches an invoker-SA token to every task, and enqueuers need no actAs on that SA. uri_override_host defaults to null, in which case the task's own URL is used, so any holder of roles/cloudtasks.enqueuer can target any URL and call every Cloud Run/Functions service the invoker SA can invoke (confused deputy, an actAs bypass). The module's own grant_enqueuers_act_as flag shows actAs is meant to be opt-in, which this composition silently defeats. No rule covers Cloud Tasks queues.",
       "file": "google_cloud_tasks_queue.main.tf",
+      "first_seen": "2026-11-18",
+      "fixable": false,
+      "id": "HOLDEN_AI_001",
+      "last_seen": "2026-11-18",
       "line": 1,
-      "resource": "google_cloud_tasks_queue.main",
+      "principle": "identity-and-access",
       "related_resources": [
         "google_cloud_tasks_queue_iam_member.enqueuers",
         "google_service_account_iam_member.service_agent_token_creator",
         "variable.uri_override_host",
         "variable.grant_enqueuers_act_as"
       ],
-      "explanation": "http_target.oidc_token attaches an invoker-SA token to every task, and enqueuers need no actAs on that SA. uri_override_host defaults to null, in which case the task's own URL is used, so any holder of roles/cloudtasks.enqueuer can target any URL and call every Cloud Run/Functions service the invoker SA can invoke (confused deputy, an actAs bypass). The module's own grant_enqueuers_act_as flag shows actAs is meant to be opt-in, which this composition silently defeats. No rule covers Cloud Tasks queues.",
       "remediation": "Require uri_override_host (which pins host with uri_override_enforce_mode = ALWAYS) unless the caller explicitly trusts enqueuers to act as the invoker SA (grant_enqueuers_act_as = true); enforce via a lifecycle precondition on the queue.",
-      "fixable": false
+      "resource": "google_cloud_tasks_queue.main",
+      "severity": "MEDIUM",
+      "status": "fixed",
+      "suppression_reason": null,
+      "title": "Queue-level OIDC token without a pinned host lets any enqueuer invoke arbitrary backends as the invoker SA",
+      "unresolved_since": null
     }
   ],
+  "scan_date": "2026-11-18T12:00:00Z",
+  "scan_path": ".",
   "suggested_policies": [
     {
-      "rationale": "A queue-level OIDC token without a uri_override host turns cloudtasks.enqueuer into the ability to invoke anything the token's SA can reach. The condition is two attributes on one resource and applies to any Terraform using google_cloud_tasks_queue, which no loaded policy covers.",
-      "yaml": "id: LOCAL_GCP_001\nname: Cloud Tasks queues attaching an OIDC token must pin the target host with uri_override\nprinciple: identity-and-access\nseverity: MEDIUM\nrationale: |\n  A queue-level http_target.oidc_token is attached to every task dispatched from the\n  queue, and enqueuers need no actAs on the token's service account. Without a\n  uri_override host, anyone with cloudtasks.enqueuer can point tasks at any URL and\n  invoke every backend that service account can reach (confused deputy).\nmessage: |\n  google_cloud_tasks_queue sets http_target.oidc_token but no http_target.uri_override.host.\nremediation: |\n  Add http_target.uri_override { scheme = \"HTTPS\", host = \"<backend host>\", uri_override_enforce_mode = \"ALWAYS\" },\n  or drop the queue-level oidc_token and have enqueuers set per-task tokens (which requires actAs).\nresources:\n  google_cloud_tasks_queue:\n    any:\n      - path: http_target.oidc_token\n        is_null: true\n      - path: http_target.uri_override.host\n        not_null: true\n",
-      "status": "installed",
       "first_seen": "2026-11-18",
-      "last_seen": "2026-11-18"
+      "last_seen": "2026-11-18",
+      "rationale": "A queue-level OIDC token without a uri_override host turns cloudtasks.enqueuer into the ability to invoke anything the token's SA can reach. The condition is two attributes on one resource and applies to any Terraform using google_cloud_tasks_queue, which no loaded policy covers.",
+      "status": "installed",
+      "yaml": "id: LOCAL_GCP_001\nname: Cloud Tasks queues attaching an OIDC token must pin the target host with uri_override\nprinciple: identity-and-access\nseverity: MEDIUM\nrationale: |\n  A queue-level http_target.oidc_token is attached to every task dispatched from the\n  queue, and enqueuers need no actAs on the token's service account. Without a\n  uri_override host, anyone with cloudtasks.enqueuer can point tasks at any URL and\n  invoke every backend that service account can reach (confused deputy).\nmessage: |\n  google_cloud_tasks_queue sets http_target.oidc_token but no http_target.uri_override.host.\nremediation: |\n  Add http_target.uri_override { scheme = \"HTTPS\", host = \"<backend host>\", uri_override_enforce_mode = \"ALWAYS\" },\n  or drop the queue-level oidc_token and have enqueuers set per-task tokens (which requires actAs).\nresources:\n  google_cloud_tasks_queue:\n    any:\n      - path: http_target.oidc_token\n        is_null: true\n      - path: http_target.uri_override.host\n        not_null: true\n"
     }
   ],
   "suggested_suppressions": []
