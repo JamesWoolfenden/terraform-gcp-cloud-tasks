@@ -49,7 +49,7 @@ No modules.
 | [google_cloud_tasks_queue_iam_member.enqueuers](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_tasks_queue_iam_member) | resource |
 | [google_service_account_iam_member.enqueuers_act_as](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_service_account_iam_member.service_agent_token_creator](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
-| [data.google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
 
@@ -61,12 +61,12 @@ No modules.
 | <a name="input_http_method"></a> [http\_method](#input\_http\_method) | HTTP method used when dispatching tasks | `string` | `"POST"` | no |
 | <a name="input_invoker_service_account"></a> [invoker\_service\_account](#input\_invoker\_service\_account) | ID (projects/PROJECT/serviceAccounts/EMAIL) of the dedicated service account whose OIDC token is attached to every dispatched task | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Region the queue is created in | `string` | `"europe-west2"` | no |
-| <a name="input_logging_sampling_ratio"></a> [logging\_sampling\_ratio](#input\_logging\_sampling\_ratio) | Fraction of task operations written to Cloud Logging (greater than 0, up to 1.0) | `number` | `1.0` | no |
+| <a name="input_logging_sampling_ratio"></a> [logging\_sampling\_ratio](#input\_logging\_sampling\_ratio) | Fraction of task operations written to Cloud Logging (greater than 0, up to 1.0) | `number` | `1` | no |
 | <a name="input_max_concurrent_dispatches"></a> [max\_concurrent\_dispatches](#input\_max\_concurrent\_dispatches) | Maximum number of concurrent tasks dispatched from the queue | `number` | `10` | no |
 | <a name="input_max_dispatches_per_second"></a> [max\_dispatches\_per\_second](#input\_max\_dispatches\_per\_second) | Maximum rate at which tasks are dispatched from the queue | `number` | `10` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name of the Cloud Tasks queue | `string` | n/a | yes |
 | <a name="input_oidc_audience"></a> [oidc\_audience](#input\_oidc\_audience) | Audience for the OIDC token. Null uses the task's target URI | `string` | `null` | no |
-| <a name="input_retry_config"></a> [retry\_config](#input\_retry\_config) | Retry behaviour for failed tasks. max\_attempts is bounded so a poison task cannot retry forever | `object({ max_attempts = optional(number, 5) max_retry_duration = optional(string, "3600s") min_backoff = optional(string, "1s") max_backoff = optional(string, "300s") max_doublings = optional(number, 5) })` | `{}` | no |
+| <a name="input_retry_config"></a> [retry\_config](#input\_retry\_config) | Retry behaviour for failed tasks. max\_attempts is bounded so a poison task cannot retry forever | <pre>object({<br/>    max_attempts       = optional(number, 5)<br/>    max_retry_duration = optional(string, "3600s")<br/>    min_backoff        = optional(string, "1s")<br/>    max_backoff        = optional(string, "300s")<br/>    max_doublings      = optional(number, 5)<br/>  })</pre> | `{}` | no |
 | <a name="input_uri_override_host"></a> [uri\_override\_host](#input\_uri\_override\_host) | Host every task is forced to (with scheme HTTPS). Null leaves the task's own URI untouched | `string` | `null` | no |
 
 ## Outputs
